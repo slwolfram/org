@@ -1,0 +1,48 @@
+POKER SERVER -*- mode: org -*-
+
+* Config
+  #+name: configuration
+  #+begin_src python :session :results none
+    database_connstring = 'sqlite:///dev.db'
+  #+end_src
+
+
+* Database
+** initialize
+  #+name: initialize-database
+  #+begin_src python :async :session :results none :tangle db.py  :exports none
+  from databases import Database
+  database = Database(database_connstring)
+  #+end_src
+
+** user table
+  #+name: create_user_table_sql
+  #+header: :db dev.db
+  #+begin_src sqlite :session :results none
+  CREATE TABLE IF NOT EXISTS Users (
+    user_id VARCHAR(20) NOT NULL,
+    username VARCHAR(20) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    password_hash VARCHAR(100) NOT NULL,
+    bankroll INTEGER NOT NULL
+    )
+  #+end_src
+
+  #+name: create-user-table
+  #+begin_src python :async :session :results none :noweb yes
+    async def create_user_table():
+        query = """<<create_user_table_sql>>"""
+        await database.execute(query=query)
+  #+end_src
+
+  #+name: test-create-user-table
+  #+begin_src ipython :async :session test :results output
+  await create_user_table()
+  #+end_src
+  
+** db-tests
+   #+begin_src python :session :results replace
+   database
+   #+end_src
+
+   #+RESULTS:
